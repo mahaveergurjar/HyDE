@@ -88,7 +88,11 @@ Wall_Change() {
 Wall_Json() {
     setIndex=0
     [ ! -d "${HYDE_THEME_DIR}" ] && echo "ERROR: \"${HYDE_THEME_DIR}\" does not exist" && exit 0
-    wallPathArray=("${HYDE_THEME_DIR}/wallpapers")
+    if [ -d "${HYDE_THEME_DIR}/wallpapers" ]; then
+        wallPathArray=("${HYDE_THEME_DIR}/wallpapers")
+    else
+        wallPathArray=("${HYDE_THEME_DIR}")
+    fi
     wallPathArray+=("${WALLPAPER_CUSTOM_PATHS[@]}")
 
     get_hashmap "${wallPathArray[@]}" # get the hashmap provides wallList and wallHash

@@ -260,7 +260,16 @@ export_hyde_config() {
     #? This function is used to re-source config files if
     #? 1. they change since the script was started
     #? 2. the script is run in a new shell instance
-    #? 3. When you needed the arrays to be available in the current shell session // bash does not export arrays
+    #? This function is used to re-source HyDE config files in the following scenarios:
+    #? 1. If the config files change since the script was started (e.g., another process or user updates theme or state).
+    #?    Example: You edit your theme or state config while this script is running; call export_hyde_config to reload changes.
+    #? 2. If the script is run in a new shell instance (e.g., after opening a new terminal or sourcing this script in a subshell).
+    #?    Example: You start a new shell session and want to ensure the latest config is loaded; call export_hyde_config at the start.
+    #? 3. If you need arrays from the config to be available in the current shell session (since bash does not export arrays).
+    #?    Example: You want to use theme or wall arrays in your shell; call export_hyde_config to populate them.
+    #? 
+    #? Usage: Call export_hyde_config whenever you need to ensure the current shell has up-to-date config and arrays.
+    #? Typically called after config changes, at shell startup, or before using config-dependent arrays.
 
     local user_conf_state="${XDG_STATE_HOME}/hyde/staterc"
     local user_conf="${XDG_STATE_HOME}/hyde/config"
