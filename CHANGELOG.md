@@ -32,6 +32,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - waybar: Try to force initialization on restore (redundancy) might fix [#1160](https://github.com/HyDE-Project/HyDE/issues/1160)
 - Added pyprland boilerplate, no configs for now
 - Hyprland: Graciously handle some of the issues hyprland config issues for unknown SHELL
+- Pyprland: Use nc or socat to communicate with pyprland instead of pure python
 
 ## v25.8.1
 

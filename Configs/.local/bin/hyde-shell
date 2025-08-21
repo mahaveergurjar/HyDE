@@ -61,7 +61,7 @@ call_wallbashScript() {
     local scriptName=$1
     shift
     local args=("${@}")
-    local dirs=("${wallbashDirs[@]}")
+    local dirs=("${WALLBASH_DIRS[@]}")
     sanitized_dirs=()
     for dir in "${dirs[@]}"; do
         if [[ -d "$dir" ]]; then
@@ -193,7 +193,7 @@ get_completion_data() {
     done < <(list_script 2>/dev/null | sort -u)
 
     # Get wallbash scripts
-    local dirs=("${wallbashDirs[@]}")
+    local dirs=("${WALLBASH_DIRS[@]}")
     wallbash_scripts=("--help") # Add --help as first option
     # Simplified - just --help for now since dynamic parsing is complex
 
@@ -459,12 +459,27 @@ run_pypr() {
     if command -v pypr >/dev/null 2>&1; then
 
         socket_path="${XDG_RUNTIME_DIR}/hypr/${HYPRLAND_INSTANCE_SIGNATURE}/.pyprland.sock"
+        if [[ -f "${XDG_CONFIG_HOME:-$HOME/.config}/hypr/pyprland.toml " ]]; then
+            send_notifs "Missing pyprland.toml" "Please create a pyprland.toml file in ${XDG_CONFIG_HOME:-$HOME/.config}/hypr/ to configure PyPR."
+            exit 1
+        fi
 
         if [[ -S "$socket_path" ]] && pgrep -u "$USER" pypr >/dev/null 2>&1; then
-            exec app2unit.sh pypr "$@"
+            message="${*:-"help"}"
+            # Send the message to the socket and print the response
+            if ! printf "%s" "${message[@]}" | nc -N -U "$socket_path"; then
+                if ! printf "%s" "${message[@]}" | socat - UNIX-CONNECT:"$socket_path"; then
+                    print_log -sec "pypr" "Error communicating with socket: $socket_path"
+                    exit 1
+                fi
+
+            fi
+
         else
             print_log -sec "pypr" "PyPR is not running properly, starting fresh"
-            rm "$socket_path"
+            [[ -S "$socket_path" ]] && print_log -y "Removing stale socket: $socket_path"
+            pgrep -u "$USER" pypr >/dev/null && print_log -y "Killing existing pypr process"
+            rm -f "$socket_path"
 
             exec app2unit.sh -t service pypr
         fi
