@@ -445,6 +445,51 @@ run_command() {
     fi
 }
 
+run_pip() {
+    python_activate
+    shift
+    pip "$@"
+}
+
+run_pypr() {
+
+    python_activate
+    shift
+
+    if command -v pypr >/dev/null 2>&1; then
+
+        socket_path="${XDG_RUNTIME_DIR}/hypr/${HYPRLAND_INSTANCE_SIGNATURE}/.pyprland.sock"
+
+        if [[ -S "$socket_path" ]] && pgrep -u "$USER" pypr >/dev/null 2>&1; then
+            exec app2unit.sh pypr "$@"
+        else
+            print_log -sec "pypr" "PyPR is not running properly, starting fresh"
+            rm "$socket_path"
+
+            exec app2unit.sh -t service pypr
+        fi
+
+    else
+        pip install --no-input pyprland==2.4.7
+    fi
+
+}
+
+lock_session() {
+    #? hyde-shell lock-session wraps around the lockscreen.sh script
+    #? lockscreen.sh activates the set lockscreen blindly
+    #? however, lock-session will check if the lockscreen is set FD's ScreenSaver
+    #? if it is, it will use loginctl lock-session
+    #? otherwise, it will use lockscreen.sh
+    if busctl --user list | grep -q "org.freedesktop.ScreenSaver"; then
+        echo "Using org.freedesktop.ScreenSaver for locking"
+        loginctl lock-session
+    else
+        lockscreen.sh
+    fi
+
+}
+
 #*--------------------------------------------------------------------------------
 
 if [[ -z "${BASH_SOURCE[0]}" ]]; then
@@ -476,7 +521,10 @@ init | --init)
     initialized
     exit 0
     ;;
-
+lock-session)
+    lock_session
+    exit 0
+    ;;
 *)
     export HYDE_SHELL_INIT=1
     ;;
@@ -495,6 +543,16 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
     case $1 in
     logout)
         hyde-logout
+        ;;
+
+    pypr)
+        run_pypr "${@}"
+        exit 0
+        ;;
+
+    pip)
+        run_pip "${@}"
+        exit 0
         ;;
     -r | reload)
         hyde_reload

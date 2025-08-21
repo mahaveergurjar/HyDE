@@ -12,19 +12,26 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Dunst: Fix dunst crashing when the font cannot handle unsupported characters -- Thanks to [#1131](https://github.com/HyDE-Project/HyDE/issues/1131)
 - UWSM: Clean up the xdg freedesktop.org spec as uwsm handles it
 - Wallpaper: fix #1136 as exporting arrays are not supported in bash
+- Lockscreen: Fix zombie hyprlock
 
 ### Changed
 
 - Core: Move wallbash to ~/.local/share/wallbash
-- wlogout: Add support for for uwsm
+- Wlogout: Add support for for uwsm
 - Flatpak: make themes,icons as rw for flatpak --user
 - Added multi-gpu message to nvidia.conf
+- Logs now will have '\*.log' as extension
+- Waybar: run as a systemd scope unit on startup
+- Wallpaper: run as a systemd scope unit on startup
 
 ### Added
 
-- hyde-shell: Add `logout` command to handle with/out uwsm
+- hyde-shell: Add 'logout' command to handle with/out uwsm
 - waybar: Add lighter temperature module (Needs manual setup)
 - Add credits page
+- waybar: Try to force initialization on restore (redundancy) might fix [#1160](https://github.com/HyDE-Project/HyDE/issues/1160)
+- Added pyprland boilerplate, no configs for now
+- Hyprland: Graciously handle some of the issues hyprland config issues for unknown SHELL
 
 ## v25.8.1
 
