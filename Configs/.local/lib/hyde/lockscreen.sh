@@ -1,7 +1,10 @@
 #!/usr/bin/env bash
 
 [[ "${HYDE_SHELL_INIT}" -ne 1 ]] && eval "$(hyde-shell init)"
+
+lockscreen="${HYPRLAND_LOCKSCREEN:-$lockscreen}"
 lockscreen="${LOCKSCREEN:-hyprlock}"
+lockscreen="${HYDE_LOCKSCREEN:-$lockscreen}"
 
 case ${1} in
     --get)
